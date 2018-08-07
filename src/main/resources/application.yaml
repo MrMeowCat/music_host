@@ -1,0 +1,9 @@
+spring:
+  couchbase:
+    bootstrap-hosts: 192.168.99.100
+    bucket:
+      name: music_host
+      password: password
+    env:
+      timeouts:
+        connect: 10000ms
