@@ -7,3 +7,11 @@ spring:
     env:
       timeouts:
         connect: 10000ms
+
+music_host:
+  username: admin
+  password: password
+
+jwt:
+  secret: youlittlehuckersucker
+  age: 2592000 # in seconds, 30 days
