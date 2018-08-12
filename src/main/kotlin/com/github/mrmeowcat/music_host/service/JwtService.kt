@@ -1,10 +1,20 @@
 package com.github.mrmeowcat.music_host.service
 
+import org.springframework.security.core.Authentication
 
+/**
+ * Service for operations with JWT tokens.
+ */
 interface JwtService {
 
-    fun createToken(username: String): String
+    /**
+     * Creates a token by given username and roles.
+     */
+    fun createToken(username: String, roles: List<String>): String
 
-    fun getUsername(token: String): String
+    /**
+     * Gets Authentication object from token.
+     */
+    fun getAuthentication(token: String): Authentication
 
 }

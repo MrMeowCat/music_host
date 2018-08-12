@@ -12,8 +12,12 @@ spring:
       auto-index: true
 
 music_host:
-  username: admin
-  password: password
+  admin:
+    username: admin
+    password: password
+  guest:
+    username: guest
+    password: password
 
 jwt:
   secret: youlittlehuckersucker

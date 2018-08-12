@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService
@@ -15,13 +16,20 @@ import org.springframework.security.web.server.SecurityWebFilterChain
  * Reactive security config.
  */
 @EnableWebFluxSecurity
+@EnableReactiveMethodSecurity
 class SecurityConfig {
 
-    @Value("\${music_host.username:admin}")
-    private lateinit var username: String
+    @Value("\${music_host.admin.username:admin}")
+    private lateinit var adminUsername: String
 
-    @Value("\${music_host.password:password}")
-    private lateinit var password: String
+    @Value("\${music_host.admin.password:password}")
+    private lateinit var adminPassword: String
+
+    @Value("\${music_host.guest.username:guest}")
+    private lateinit var guestUsername: String
+
+    @Value("\${music_host.guest.password:password}")
+    private lateinit var guestPassword: String
 
     @Bean
     fun securityWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
@@ -40,12 +48,17 @@ class SecurityConfig {
 
     @Bean
     fun mapReactiveUserDetailsService(): MapReactiveUserDetailsService {
-        val user: UserDetails = User.withDefaultPasswordEncoder()
-                .username(username)
-                .password(password)
-                .roles()
+        val admin: UserDetails = User.withDefaultPasswordEncoder()
+                .username(adminUsername)
+                .password(adminPassword)
+                .roles("ADMIN")
                 .build()
-        return MapReactiveUserDetailsService(user)
+        val guest: UserDetails = User.withDefaultPasswordEncoder()
+                .username(guestUsername)
+                .password(guestPassword)
+                .roles("GUEST")
+                .build()
+        return MapReactiveUserDetailsService(admin, guest)
     }
 
     @Bean

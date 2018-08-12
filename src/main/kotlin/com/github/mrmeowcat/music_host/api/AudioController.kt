@@ -4,6 +4,7 @@ import com.github.mrmeowcat.music_host.dto.Audio
 import com.github.mrmeowcat.music_host.service.AudioService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -39,16 +40,19 @@ class AudioController {
         return audioService.findOne(id).map { ResponseEntity.ok(it) }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("audio")
     fun upload(@RequestBody audio: Audio?): Mono<ResponseEntity<Audio>> {
         return audioService.save(audio).map { ResponseEntity.ok(it) }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("audio")
     fun update(@RequestBody audio: Audio?): Mono<ResponseEntity<Audio>> {
         return audioService.save(audio).map { ResponseEntity.ok(it) }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("audio/{id}")
     fun delete(@PathVariable("id") id: String = ""): Mono<Void> {
         return audioService.delete(id)

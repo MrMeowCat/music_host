@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
 
+/**
+ * Authentication entry point.
+ */
 @RestController
 @RequestMapping("/api")
 class AuthenticationController(val authenticationManager: ReactiveAuthenticationManager,
@@ -22,7 +25,7 @@ class AuthenticationController(val authenticationManager: ReactiveAuthentication
     fun login(@RequestBody credentials: Credentials): Mono<ResponseEntity<String>> {
         return authenticationManager
                 .authenticate(UsernamePasswordAuthenticationToken(credentials.username, credentials.password))
-                .map { ResponseEntity.ok(jwtService.createToken(it.name)) }
+                .map { ResponseEntity.ok(jwtService.createToken(it.name, it.authorities.map { it.authority })) }
                 .onErrorReturn(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build())
     }
 }
