@@ -6,7 +6,10 @@ spring:
       password: password
     env:
       timeouts:
-        connect: 10000ms
+        connect: 30000ms
+  data:
+    couchbase:
+      auto-index: true
 
 music_host:
   username: admin

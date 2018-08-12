@@ -11,14 +11,17 @@ import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.web.server.SecurityWebFilterChain
 
+/**
+ * Reactive security config.
+ */
 @EnableWebFluxSecurity
 class SecurityConfig {
 
     @Value("\${music_host.username:admin}")
-    lateinit var username: String
+    private lateinit var username: String
 
     @Value("\${music_host.password:password}")
-    lateinit var password: String
+    private lateinit var password: String
 
     @Bean
     fun securityWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
