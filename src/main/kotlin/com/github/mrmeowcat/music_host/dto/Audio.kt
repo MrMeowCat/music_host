@@ -5,15 +5,15 @@ package com.github.mrmeowcat.music_host.dto
  */
 class Audio : AbstractDto() {
 
-    var name: String? = ""
+    var title: String? = null
 
-    var author: String? = ""
+    var author: String? = null
 
     var duration: Int = 0
 
-    var lyrics: String? = ""
+    var lyrics: String? = null
 
-    var filePath: String? = ""
+    var fileName: String? = null
 
-    var thumbnailPath: String? = ""
+    var coverArtName: String? = null
 }

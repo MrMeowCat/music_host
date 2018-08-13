@@ -1,9 +1,11 @@
 package com.github.mrmeowcat.music_host.api
 
 import com.github.mrmeowcat.music_host.dto.Audio
+import com.github.mrmeowcat.music_host.service.AudioFileService
 import com.github.mrmeowcat.music_host.service.AudioService
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.http.codec.multipart.FilePart
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -12,19 +14,19 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
+import java.io.File
 
 /**
  * Controller for audios.
  */
 @RestController
 @RequestMapping("/api")
-class AudioController {
-
-    @Autowired
-    private lateinit var audioService: AudioService
+class AudioController(private val audioService: AudioService,
+                      private val audioFileService: AudioFileService) {
 
     @GetMapping("audio")
     fun getAll(): Mono<ResponseEntity<List<Audio>>> {
@@ -41,9 +43,19 @@ class AudioController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("audio")
-    fun upload(@RequestBody audio: Audio?): Mono<ResponseEntity<Audio>> {
-        return audioService.save(audio).map { ResponseEntity.ok(it) }
+    @PostMapping("audio", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun upload(@RequestPart("file") fileMono: Mono<FilePart>): Mono<ResponseEntity<Audio>> {
+        var fileName = ""
+        return fileMono
+                .map {
+                    val file: File = audioFileService.prepareFile(it)
+                    fileName = file.name
+                    file
+                }
+                .map { audioFileService.parseAudioFile(it) }
+                .flatMap { audioService.save(it) }
+                .doOnError { audioFileService.deleteAudioFile(fileName) }
+                .map { ResponseEntity.ok(it) }
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -55,6 +67,8 @@ class AudioController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("audio/{id}")
     fun delete(@PathVariable("id") id: String = ""): Mono<Void> {
-        return audioService.delete(id)
+        return audioService.findOne(id)
+                .map { audioFileService.deleteAudioFile(it.fileName) }
+                .flatMap { audioService.delete(id) }
     }
 }

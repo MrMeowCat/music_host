@@ -11,8 +11,8 @@ import reactor.core.publisher.Mono
  * Implementation of AudioService.
  */
 @Service
-class AudioServiceImpl(val audioRepository: AudioRepository,
-                       val audioMapper: AudioMapper) : AudioService {
+class AudioServiceImpl(private val audioRepository: AudioRepository,
+                       private val audioMapper: AudioMapper) : AudioService {
 
     override fun findAll(): Flux<Audio> =
             audioRepository.findAll().map { audioMapper.mapToDto(it) }

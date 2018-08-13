@@ -7,6 +7,7 @@ spring:
     env:
       timeouts:
         connect: 30000ms
+        socket-connect: 10000ms
   data:
     couchbase:
       auto-index: true
@@ -18,6 +19,8 @@ music_host:
   guest:
     username: guest
     password: password
+  storage:
+    path: D:\DEVELOP\music_host
 
 jwt:
   secret: youlittlehuckersucker

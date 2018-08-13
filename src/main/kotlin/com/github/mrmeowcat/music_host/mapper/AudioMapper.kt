@@ -19,12 +19,12 @@ class AudioMapper : Doc2DtoMapper<AudioDocument, Audio> {
             id = doc.id
             createdDate = doc.createdDate.time
             updatedDate = doc.updatedDate.time
-            name = doc.name
+            title = doc.title
             author = doc.author
             duration = doc.duration
             lyrics = doc.lyrics
-            filePath = doc.filePath
-            thumbnailPath = doc.thumbnailPath
+            fileName = doc.fileName
+            coverArtName = doc.coverArtName
         }
     }
 
@@ -34,12 +34,12 @@ class AudioMapper : Doc2DtoMapper<AudioDocument, Audio> {
             id = dto.id
             createdDate = Date(dto.createdDate)
             updatedDate = Date(dto.updatedDate)
-            name = dto.name
+            title = dto.title
             author = dto.author
             duration = dto.duration
             lyrics = dto.lyrics
-            filePath = dto.filePath
-            thumbnailPath = dto.thumbnailPath
+            fileName = dto.fileName
+            coverArtName = dto.coverArtName
         }
     }
 }

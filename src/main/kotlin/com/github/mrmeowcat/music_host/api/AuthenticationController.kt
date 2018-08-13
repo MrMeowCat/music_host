@@ -16,8 +16,8 @@ import reactor.core.publisher.Mono
  */
 @RestController
 @RequestMapping("/api")
-class AuthenticationController(val authenticationManager: ReactiveAuthenticationManager,
-                               val jwtService: JwtService) {
+class AuthenticationController(private val authenticationManager: ReactiveAuthenticationManager,
+                               private val jwtService: JwtService) {
 
     data class Credentials(val username: String, val password: String)
 
