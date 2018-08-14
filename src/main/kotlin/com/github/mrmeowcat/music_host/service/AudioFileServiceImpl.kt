@@ -25,7 +25,7 @@ class AudioFileServiceImpl : AudioFileService {
     @Value("\${music_host.storage.path}")
     private lateinit var filePath: String
 
-    override fun prepareFile(part: FilePart): File {
+    override fun prepareAudioFile(part: FilePart): File {
         validateExtension(part.filename())
         val extension: String = FilenameUtils.getExtension(part.filename())
         val file = File("$filePath${File.separatorChar}${Date().time}.$extension")
@@ -48,6 +48,8 @@ class AudioFileServiceImpl : AudioFileService {
             this.coverArtName = coverArtName
         }
     }
+
+    override fun getAudioFile(name: String?): File = File("$filePath${File.separatorChar}$name")
 
     override fun deleteAudioFile(name: String?) {
         validateExtension(name)

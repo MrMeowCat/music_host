@@ -12,12 +12,17 @@ interface AudioFileService {
     /**
      * Saves multipart as file on filesystem.
      */
-    fun prepareFile(part: FilePart): File
+    fun prepareAudioFile(part: FilePart): File
 
     /**
      * Parses audio file and saves cover art if present.
      */
     fun parseAudioFile(file: File): Audio
+
+    /**
+     * Gets audio file.
+     */
+    fun getAudioFile(name: String?): File
 
     /**
      * Deletes audio and cover art if present.

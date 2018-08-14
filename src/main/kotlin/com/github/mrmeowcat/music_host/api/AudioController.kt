@@ -3,6 +3,8 @@ package com.github.mrmeowcat.music_host.api
 import com.github.mrmeowcat.music_host.dto.Audio
 import com.github.mrmeowcat.music_host.service.AudioFileService
 import com.github.mrmeowcat.music_host.service.AudioService
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.Resource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.multipart.FilePart
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import java.io.File
@@ -42,13 +45,22 @@ class AudioController(private val audioService: AudioService,
         return audioService.findOne(id).map { ResponseEntity.ok(it) }
     }
 
+    @GetMapping("audio/file/{fileName}", produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE])
+    fun streamFile(@PathVariable("fileName") fileName: String = "") : Flux<Resource> {
+        val file: File = audioFileService.getAudioFile(fileName)
+        if (!file.exists()) {
+            return Flux.empty()
+        }
+        return Flux.just(FileSystemResource(file))
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("audio", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun upload(@RequestPart("file") fileMono: Mono<FilePart>): Mono<ResponseEntity<Audio>> {
         var fileName = ""
         return fileMono
                 .map {
-                    val file: File = audioFileService.prepareFile(it)
+                    val file: File = audioFileService.prepareAudioFile(it)
                     fileName = file.name
                     file
                 }

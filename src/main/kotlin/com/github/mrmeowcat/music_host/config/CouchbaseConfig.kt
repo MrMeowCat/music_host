@@ -1,6 +1,8 @@
 package com.github.mrmeowcat.music_host.config
 
 import com.couchbase.client.java.Bucket
+import com.couchbase.client.java.env.CouchbaseEnvironment
+import com.couchbase.client.java.env.DefaultCouchbaseEnvironment
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.couchbase.config.AbstractCouchbaseConfiguration
@@ -24,6 +26,9 @@ class CouchbaseConfig : AbstractCouchbaseConfiguration() {
     @Value("\${spring.couchbase.bucket.password}")
     private lateinit var bucketPassword: String
 
+    @Value("\${spring.couchbase.env.timeouts.connect}")
+    private val connectTimeout: Long = 0
+
     override fun getBucketPassword(): String {
         return bucketPassword
     }
@@ -34,6 +39,12 @@ class CouchbaseConfig : AbstractCouchbaseConfiguration() {
 
     override fun getBootstrapHosts(): MutableList<String> {
         return hosts
+    }
+
+    override fun couchbaseEnvironment(): CouchbaseEnvironment {
+        return DefaultCouchbaseEnvironment.builder()
+                .connectTimeout(connectTimeout)
+                .build()
     }
 
     /**
