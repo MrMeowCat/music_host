@@ -21,11 +21,18 @@ class AuthenticationController(private val authenticationManager: ReactiveAuthen
 
     data class Credentials(val username: String, val password: String)
 
+    data class SuccessResponse(val token: String, val authorities: List<String>)
+
     @PostMapping("login")
-    fun login(@RequestBody credentials: Credentials): Mono<ResponseEntity<String>> {
+    fun login(@RequestBody credentials: Credentials): Mono<ResponseEntity<SuccessResponse>> {
         return authenticationManager
                 .authenticate(UsernamePasswordAuthenticationToken(credentials.username, credentials.password))
-                .map { ResponseEntity.ok(jwtService.createToken(it.name, it.authorities.map { it.authority })) }
+                .map {
+                    val authorities: List<String> = it.authorities.map { it.authority }
+                    val token: String = jwtService.createToken(it.name, authorities)
+                    val response = SuccessResponse(token, authorities)
+                    ResponseEntity.ok(response) 
+                }
                 .onErrorReturn(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build())
     }
 }

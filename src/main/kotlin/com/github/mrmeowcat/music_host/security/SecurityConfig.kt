@@ -2,7 +2,6 @@ package com.github.mrmeowcat.music_host.security
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
-import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
@@ -40,7 +39,7 @@ class SecurityConfig {
                 .logout().disable()
                 .securityContextRepository(securityContextRepository())
                 .authorizeExchange()
-                .pathMatchers(HttpMethod.POST, "/api/login").permitAll()
+                .pathMatchers("/api/login").permitAll()
                 .anyExchange().authenticated()
                 .and()
                 .build()
