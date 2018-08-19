@@ -42,6 +42,8 @@ class SecurityConfig {
                 .authorizeExchange()
                 .pathMatchers(HttpMethod.OPTIONS).permitAll()
                 .pathMatchers("/api/login").permitAll()
+                .pathMatchers("/api/audio/file/**").permitAll()
+                .pathMatchers("/api/audio/cover/**").permitAll()
                 .anyExchange().authenticated()
                 .and()
                 .build()

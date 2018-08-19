@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
@@ -32,9 +33,10 @@ class AudioController(private val audioService: AudioService,
                       private val audioFileService: AudioFileService) {
 
     @GetMapping("audio")
-    fun getAll(): Mono<ResponseEntity<List<Audio>>> {
+    fun getAll(@RequestParam("query", required = false) query: String = "")
+            : Mono<ResponseEntity<List<Audio>>> {
         return audioService
-                .findAll()
+                .findAll(query)
                 .collectList()
                 .toMono()
                 .map { ResponseEntity.ok(it) }
@@ -47,7 +49,16 @@ class AudioController(private val audioService: AudioService,
 
     @GetMapping("audio/file/{fileName}", produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE])
     fun streamFile(@PathVariable("fileName") fileName: String = "") : Flux<Resource> {
-        val file: File = audioFileService.getAudioFile(fileName)
+        val file: File = audioFileService.getFile(fileName)
+        if (!file.exists()) {
+            return Flux.empty()
+        }
+        return Flux.just(FileSystemResource(file))
+    }
+
+    @GetMapping("audio/cover/{coverName}")
+    fun getCoverArt(@PathVariable("coverName") coverName: String = "") : Flux<Resource> {
+        val file: File = audioFileService.getFile(coverName)
         if (!file.exists()) {
             return Flux.empty()
         }
@@ -60,13 +71,13 @@ class AudioController(private val audioService: AudioService,
         var fileName = ""
         return fileMono
                 .map {
-                    val file: File = audioFileService.prepareAudioFile(it)
+                    val file: File = audioFileService.prepareFile(it)
                     fileName = file.name
                     file
                 }
-                .map { audioFileService.parseAudioFile(it) }
+                .map { audioFileService.parseFile(it) }
                 .flatMap { audioService.save(it) }
-                .doOnError { audioFileService.deleteAudioFile(fileName) }
+                .doOnError { audioFileService.deleteFile(fileName) }
                 .map { ResponseEntity.ok(it) }
     }
 
@@ -80,7 +91,7 @@ class AudioController(private val audioService: AudioService,
     @DeleteMapping("audio/{id}")
     fun delete(@PathVariable("id") id: String = ""): Mono<Void> {
         return audioService.findOne(id)
-                .map { audioFileService.deleteAudioFile(it.fileName) }
+                .map { audioFileService.deleteFile(it.fileName) }
                 .flatMap { audioService.delete(id) }
     }
 }

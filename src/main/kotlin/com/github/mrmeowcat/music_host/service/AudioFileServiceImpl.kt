@@ -25,21 +25,30 @@ class AudioFileServiceImpl : AudioFileService {
     @Value("\${music_host.storage.path}")
     private lateinit var filePath: String
 
-    override fun prepareAudioFile(part: FilePart): File {
+    override fun prepareFile(part: FilePart): File {
         validateExtension(part.filename())
         val extension: String = FilenameUtils.getExtension(part.filename())
-        val file = File("$filePath${File.separatorChar}${Date().time}.$extension")
+        val file = File("$filePath${File.separatorChar}${Date().time}-${UUID.randomUUID()}.$extension")
         part.transferTo(file).then()
         return file
     }
 
-    override fun parseAudioFile(file: File): Audio {
+    override fun parseFile(file: File): Audio {
         val audioFile: AudioFile = AudioFileIO.read(file)
-        val tag: Tag = audioFile.tag
-        val coverArtName: String? = if (tag.firstArtwork != null)
-            FilenameUtils.getBaseName(file.name) else null
+        val tag: Tag? = audioFile.tag
+        tag ?: return dto {
+            createdDate = Date().time
+            updatedDate = createdDate
+            duration = audioFile.audioHeader.trackLength
+            fileName = file.name
+        }
+
+        val coverArtName: String = if (tag.firstArtwork != null)
+            FilenameUtils.getBaseName(file.name) else ""
         saveCoverArt(tag.firstArtwork, coverArtName)
         return dto {
+            createdDate = Date().time
+            updatedDate = createdDate
             title = tag.getFirst(FieldKey.TITLE)
             author = tag.getFirst(FieldKey.ARTIST)
             duration = audioFile.audioHeader.trackLength
@@ -49,9 +58,9 @@ class AudioFileServiceImpl : AudioFileService {
         }
     }
 
-    override fun getAudioFile(name: String?): File = File("$filePath${File.separatorChar}$name")
+    override fun getFile(name: String): File = File("$filePath${File.separatorChar}$name")
 
-    override fun deleteAudioFile(name: String?) {
+    override fun deleteFile(name: String) {
         validateExtension(name)
         val audioFile = File("$filePath${File.separatorChar}$name")
         val coverArtFile = File("$filePath${File.separatorChar}${FilenameUtils.getBaseName(name)}")
@@ -59,13 +68,13 @@ class AudioFileServiceImpl : AudioFileService {
         Files.deleteIfExists(coverArtFile.toPath())
     }
 
-    private fun validateExtension(fileName: String?) {
+    private fun validateExtension(fileName: String) {
         if (FilenameUtils.getExtension(fileName).isNullOrEmpty()) {
             throw IllegalArgumentException("Audio file must have extension!")
         }
     }
 
-    private fun saveCoverArt(art: Artwork?, name: String?) {
+    private fun saveCoverArt(art: Artwork?, name: String) {
         art ?: return
         FileOutputStream("$filePath${File.separatorChar}$name").use {
             it.write(art.binaryData)

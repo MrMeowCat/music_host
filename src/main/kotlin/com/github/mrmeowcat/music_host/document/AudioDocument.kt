@@ -10,20 +10,20 @@ import org.springframework.data.couchbase.core.mapping.Document
 class AudioDocument : AbstractDocument() {
 
     @Field
-    var title: String? = null
+    var title: String = ""
 
     @Field
-    var author: String? = null
+    var author: String = ""
 
     @Field
     var duration: Int = 0
 
     @Field
-    var lyrics: String? = null
+    var lyrics: String = ""
 
     @Field
-    var fileName: String? = null
+    var fileName: String = ""
 
     @Field
-    var coverArtName: String? = null
+    var coverArtName: String = ""
 }
