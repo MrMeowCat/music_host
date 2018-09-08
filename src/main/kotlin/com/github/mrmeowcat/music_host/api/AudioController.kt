@@ -33,10 +33,9 @@ class AudioController(private val audioService: AudioService,
                       private val audioFileService: AudioFileService) {
 
     @GetMapping("audio")
-    fun getAll(@RequestParam("query", required = false) query: String = "")
-            : Mono<ResponseEntity<List<Audio>>> {
+    fun getAll() : Mono<ResponseEntity<List<Audio>>> {
         return audioService
-                .findAll(query)
+                .findAll()
                 .collectList()
                 .toMono()
                 .map { ResponseEntity.ok(it) }

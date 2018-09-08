@@ -11,7 +11,7 @@ interface CrudService<Dto, ID> {
     /**
      * Finds all records.
      */
-    fun findAll(query: String): Flux<Dto>
+    fun findAll(): Flux<Dto>
 
     /**
      * Finds a record by id.
