@@ -22,6 +22,10 @@ import java.util.*
 @Service
 class AudioFileServiceImpl : AudioFileService {
 
+    private companion object {
+        val ALLOWED_EXTENSIONS = listOf("mp3", "flac", "wav")
+    }
+
     @Value("\${music_host.storage.path}")
     private lateinit var filePath: String
 
@@ -38,7 +42,6 @@ class AudioFileServiceImpl : AudioFileService {
         val tag: Tag? = audioFile.tag
         tag ?: return dto {
             createdDate = Date().time
-            updatedDate = createdDate
             duration = audioFile.audioHeader.trackLength
             fileName = file.name
         }
@@ -48,7 +51,6 @@ class AudioFileServiceImpl : AudioFileService {
         saveCoverArt(tag.firstArtwork, coverArtName)
         return dto {
             createdDate = Date().time
-            updatedDate = createdDate
             title = tag.getFirst(FieldKey.TITLE)
             author = tag.getFirst(FieldKey.ARTIST)
             duration = audioFile.audioHeader.trackLength
@@ -69,8 +71,12 @@ class AudioFileServiceImpl : AudioFileService {
     }
 
     private fun validateExtension(fileName: String) {
-        if (FilenameUtils.getExtension(fileName).isNullOrEmpty()) {
+        val extension: String? = FilenameUtils.getExtension(fileName)
+        if (extension == null || extension.isEmpty()) {
             throw IllegalArgumentException("Audio file must have extension!")
+        }
+        if (!ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
+            throw IllegalArgumentException("Unknown extension: $extension")
         }
     }
 

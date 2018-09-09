@@ -24,9 +24,6 @@ abstract class AbstractDocument {
     @Field
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     var updatedDate: Date = Date()
-
-    @Field
-    var version: Int = 0
 }
 
 /**

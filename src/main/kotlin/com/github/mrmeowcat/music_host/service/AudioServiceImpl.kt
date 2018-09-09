@@ -6,6 +6,7 @@ import com.github.mrmeowcat.music_host.repository.AudioRepository
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.util.*
 
 /**
  * Implementation of AudioService.
@@ -22,6 +23,7 @@ class AudioServiceImpl(private val audioRepository: AudioRepository,
 
     override fun save(dto: Audio?): Mono<Audio> {
         dto ?: throw IllegalArgumentException("Cannot save null")
+        dto.updatedDate = Date().time
         return audioRepository
                 .save(audioMapper.mapToDoc(dto)!!)
                 .map { audioMapper.mapToDto(it) }

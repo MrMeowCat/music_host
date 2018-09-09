@@ -33,7 +33,7 @@ class AudioController(private val audioService: AudioService,
                       private val audioFileService: AudioFileService) {
 
     @GetMapping("audio")
-    fun getAll() : Mono<ResponseEntity<List<Audio>>> {
+    fun getAll(): Mono<ResponseEntity<List<Audio>>> {
         return audioService
                 .findAll()
                 .collectList()
@@ -47,7 +47,7 @@ class AudioController(private val audioService: AudioService,
     }
 
     @GetMapping("audio/file/{fileName}", produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE])
-    fun streamFile(@PathVariable("fileName") fileName: String = "") : Flux<Resource> {
+    fun streamFile(@PathVariable("fileName") fileName: String = ""): Flux<Resource> {
         val file: File = audioFileService.getFile(fileName)
         if (!file.exists()) {
             return Flux.empty()
@@ -56,7 +56,7 @@ class AudioController(private val audioService: AudioService,
     }
 
     @GetMapping("audio/cover/{coverName}")
-    fun getCoverArt(@PathVariable("coverName") coverName: String = "") : Flux<Resource> {
+    fun getCoverArt(@PathVariable("coverName") coverName: String = ""): Flux<Resource> {
         val file: File = audioFileService.getFile(coverName)
         if (!file.exists()) {
             return Flux.empty()
